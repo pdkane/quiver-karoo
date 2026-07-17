@@ -6,6 +6,11 @@
          (OnHttpResponse.MakeHttpRequest), so no INTERNET permission is required for
          that path. INTERNET is declared for defensiveness / future direct calls. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- The sync service promotes itself to the foreground so the Karoo System can't
+         tear it down mid-ride (a bound-only extension with no data types has no other
+         reason to stay alive). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:allowBackup="true"
@@ -33,6 +38,7 @@
         <service
             android:name=".extension.QuiverExtension"
             android:exported="true"
+            android:foregroundServiceType="dataSync"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="io.hammerhead.karooext.KAROO_EXTENSION" />

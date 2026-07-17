@@ -54,12 +54,22 @@ endpoints — the seed route was clearly designed against it.
    against the real SDK API but unverified by a compiler).
 4. **[PK] On-device test on the Karoo 3** (sideload via Companion):
    - Pair with a real code from quiver.fyi; confirm the board seeds.
-   - Do a short real/simulated ride; confirm mileage lands on the Melee odometer.
-   - **Top runtime risk to verify:** that the Karoo System keeps `QuiverExtension`
-     bound/alive during a ride so it receives `RideState`/distance events. If not,
-     fall back to a foreground service or drive sync from an activity. (Established
-     community extensions use the onCreate pattern we use, so this is expected to
-     work — but it's the #1 thing to confirm.)
+   - Do a short real/simulated ride; confirm mileage lands on the **Melee** odometer
+     (not a stray/default bike — see attribution note below).
+   - **Verify service liveness across a full ride.** We promote `QuiverExtension` to
+     a started **foreground `dataSync` service** (persistent "Syncing your rides"
+     notification) so the Karoo unbinding us can't kill it mid-ride. Confirm the
+     notification stays up for the whole ride and that `RideState`/distance events
+     arrive. (Evidence: veloVigil — the one real background-sync extension — runs the
+     same onCreate pattern; it keeps its service alive partly via declared data
+     types. Our foreground promotion is the belt-and-suspenders alternative. If FGS
+     misbehaves on the Karoo, the fallback is to declare a trivial data type like
+     veloVigil.)
+   - **Verify ride-end fires.** We end a ride on `RideState.Recording → Idle`.
+     veloVigil found the Karoo doesn't always emit `Idle` and added an inactivity
+     watchdog. We deliberately didn't (our single-POST model makes a false end
+     lossy). If `Idle` proves unreliable on-device, add a non-lossy end-detector
+     (e.g. checkpoint distance to the outbox, finalize on next Recording).
 5. **[Eng] Create the GitHub repo** (`quiver-fyi/quiver-karoo` assumed — confirm),
    push, cut a release with `quiver-karoo.apk` + `manifest.json` + icon.
 6. **[PK] Announce** the sideload link to Quiver riders.
@@ -74,8 +84,12 @@ endpoints — the seed route was clearly designed against it.
 ## Known limitations / fast-follows
 
 - **Ride distance** uses the `DISTANCE` stream captured at ride end (monotonic-max
-  guarded). Per-bike attribution relies on the rider's Karoo bike selection / the
-  seed; unassigned rides fall to the backend's default handling.
+  guarded).
+- **Per-bike attribution** rides on the ride *fingerprint*: each finished ride POSTs
+  its active sensor serials (`devices: [{serial,name,kind}]`, e.g. the Quarq PM),
+  which `recordRide` matches to the bike. bikeId is null (the Karoo bike id isn't
+  Quiver's), so **the fingerprint is what lands mileage on the right bike** — verify
+  the Melee's power-meter serial is present in `SavedDevices` on-device.
 - `movingTimeS` is sent as null in v1 (elapsed ≠ moving); add later if useful.
 - Seed device `kind` is a best-effort token from supported data types (backend
   normalizes unknown → 'other').

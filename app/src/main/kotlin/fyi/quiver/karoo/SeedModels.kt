@@ -50,6 +50,16 @@ data class SeedPayload(
     val profile: SeedProfile? = null,
 )
 
+/** A sensor active for a ride. `serial` is the fingerprint the backend matches to a
+ *  bike (e.g. the power-meter serial), so it drives per-bike attribution when no
+ *  explicit bikeId is known. */
+@Serializable
+data class RideDevice(
+    val serial: String,
+    val name: String? = null,
+    val kind: String? = null,
+)
+
 @Serializable
 data class RidePayload(
     val source: String = "hammerhead",
@@ -58,4 +68,7 @@ data class RidePayload(
     val movingTimeS: Long? = null,
     val rideEndedAt: String? = null,
     val bikeId: String? = null,
+    /** Ride fingerprint — the backend attributes the mileage to the bike carrying
+     *  these serials. Without it a null-bikeId ride can't reach the right bike. */
+    val devices: List<RideDevice>? = null,
 )

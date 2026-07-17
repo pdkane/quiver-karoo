@@ -43,6 +43,33 @@ object SeedMapper {
         }?.ifEmpty { null },
     )
 
+    /**
+     * The ride fingerprint: every saved sensor that carries a serial, as
+     * [RideDevice]s. The backend matches these serials to a bike, so attaching them
+     * to a finished ride is what lets null-bikeId mileage reach the right bike.
+     */
+    fun rideDevices(devices: List<SavedDevices.SavedDevice>): List<RideDevice>? =
+        devices.mapNotNull { d ->
+            val serial = d.details.serialNumber?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            RideDevice(serial = serial, name = d.name, kind = canonicalKind(d.supportedDataTypes))
+        }.ifEmpty { null }
+
+    /** Best-effort canonical Quiver BleKind for a sensor (cosmetic; serial drives
+     *  attribution). */
+    private fun canonicalKind(supportedDataTypes: List<String>): String {
+        val ids = supportedDataTypes.map { it.uppercase() }
+        fun any(vararg needles: String) = ids.any { id -> needles.any { id.contains(it) } }
+        return when {
+            any("RADAR") -> "radar"
+            any("SHIFTING") -> "shifting"
+            any("POWER") -> "power-meter"
+            any("HEART_RATE", "_HR_", "HR_ID") -> "heart-rate"
+            any("CAD") -> "cadence"
+            any("SPEED") -> "speed"
+            else -> "other"
+        }
+    }
+
     private fun UserProfile.toSeedProfile(): SeedProfile? {
         val kg = weight.takeIf { it > 0f }?.toDouble()
         val watts = ftp.takeIf { it > 0 }

@@ -15,7 +15,14 @@ import io.hammerhead.karooext.models.RideState
 import io.hammerhead.karooext.models.SavedDevices
 import io.hammerhead.karooext.models.StreamState
 import io.hammerhead.karooext.models.UserProfile
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -55,9 +62,16 @@ class QuiverExtension : KarooExtension("quiver", BuildConfig.VERSION_NAME) {
     @Volatile private var latestProfile: UserProfile? = null
     @Volatile private var seededThisConnection = false
 
+    @Volatile private var isForeground = false
+
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "QuiverExtension onCreate")
+        // Promote to a *started* foreground service so the Karoo System unbinding us
+        // (we declare no data types) doesn't tear the service down mid-ride.
+        runCatching {
+            ContextCompat.startForegroundService(this, Intent(this, QuiverExtension::class.java))
+        }
         karooSystem = KarooSystemService(applicationContext)
 
         karooSystem.connect { connected ->
@@ -78,6 +92,36 @@ class QuiverExtension : KarooExtension("quiver", BuildConfig.VERSION_NAME) {
         consumerIds += karooSystem.addConsumer { event: Bikes -> latestBikes = event.bikes }
         consumerIds += karooSystem.addConsumer { event: SavedDevices -> latestDevices = event.devices }
         consumerIds += karooSystem.addConsumer { event: UserProfile -> latestProfile = event }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        ensureForeground()
+        return START_STICKY
+    }
+
+    private fun ensureForeground() {
+        if (isForeground) return
+        val channelId = "quiver_sync"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nm = getSystemService(NotificationManager::class.java)
+            if (nm != null && nm.getNotificationChannel(channelId) == null) {
+                nm.createNotificationChannel(
+                    NotificationChannel(channelId, "Ride sync", NotificationManager.IMPORTANCE_LOW),
+                )
+            }
+        }
+        val notification: Notification = Notification.Builder(this, channelId)
+            .setContentTitle("Quiver")
+            .setContentText("Syncing your rides to your garage")
+            .setSmallIcon(android.R.drawable.stat_notify_sync)
+            .setOngoing(true)
+            .build()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
+        isForeground = true
     }
 
     override fun onDestroy() {
@@ -135,6 +179,8 @@ class QuiverExtension : KarooExtension("quiver", BuildConfig.VERSION_NAME) {
             externalId = externalId,
             distanceMeters = distanceMeters,
             rideEndedAt = iso8601(System.currentTimeMillis()),
+            // Fingerprint so the backend attributes the miles to the right bike.
+            devices = SeedMapper.rideDevices(latestDevices),
         )
         val ride = QuiverApi.json.encodeToString(payload)
         RideOutbox.add(applicationContext, ride)
@@ -177,6 +223,7 @@ class QuiverExtension : KarooExtension("quiver", BuildConfig.VERSION_NAME) {
 
     companion object {
         private const val TAG = "QuiverExtension"
+        private const val NOTIFICATION_ID = 1001
 
         /** Ignore sub-100 m "rides" (a bump into the record button, a paused test). */
         private const val MIN_RIDE_METERS = 100.0
