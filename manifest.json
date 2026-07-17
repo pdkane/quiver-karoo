@@ -1,11 +1,11 @@
 {
-  "label": "Quiver",
+  "label": "Quiver Odometer",
   "packageName": "fyi.quiver.karoo",
-  "latestApkUrl": "https://github.com/pdkane/quiver-karoo/releases/latest/download/quiver-karoo.apk",
-  "latestVersion": "0.1.0",
-  "latestVersionCode": 1,
+  "latestApkUrl": "https://github.com/pdkane/quiver-karoo/releases/latest/download/quiver-odometer.apk",
+  "latestVersion": "1.2",
+  "latestVersionCode": 3,
   "developer": "Quiver",
-  "description": "Connect your Karoo to your Quiver garage. Pair once, and every ride's mileage syncs automatically to keep your maintenance, wear, and service clocks up to date — no manual logging.",
-  "releaseNotes": "First release: pair with your Quiver account and automatic ride-mileage sync.",
+  "description": "Pair your Karoo with your Quiver garage. Every finished ride's mileage syncs automatically, plus one-tap backfill of your entire Karoo ride history — your maintenance, wear, and service clocks stay current with zero logging.",
+  "releaseNotes": "Foreground-service reliability (survives long rides) + in-device auto-update via the Companion app.",
   "tags": ["utility"]
 }
