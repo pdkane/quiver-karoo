@@ -24,7 +24,7 @@
              manifest.json published with each GitHub release. -->
         <meta-data
             android:name="io.hammerhead.karooext.MANIFEST_URL"
-            android:value="https://github.com/quiver-fyi/quiver-karoo/releases/latest/download/manifest.json" />
+            android:value="https://github.com/pdkane/quiver-karoo/releases/latest/download/manifest.json" />
 
         <activity
             android:name=".ui.MainActivity"

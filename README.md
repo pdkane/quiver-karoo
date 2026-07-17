@@ -74,10 +74,10 @@ app/src/main/kotlin/fyi/quiver/karoo/
 - Extension id: `quiver` (in `extension_info.xml` and `QuiverExtension`).
 - Application id / namespace: `fyi.quiver.karoo`.
 - The GitHub org/repo in `manifest.json` and `AndroidManifest.xml` (`MANIFEST_URL`)
-  is currently `quiver-fyi/quiver-karoo` — update if the repo lives elsewhere.
+  is currently `pdkane/quiver-karoo` — update if the repo lives elsewhere.
 
 ## Status
 
-v1 is written against `karoo-ext` 1.1.9 but **has not yet been compiled or run on
-hardware** (no Android toolchain / package token in the authoring environment). See
-`GAMEPLAN.md` for the finish-line checklist and the official-store (partner) track.
+v1 **builds green** (`./gradlew assembleDebug`) against `karoo-ext` 1.1.9 on JDK 17
+/ Android SDK 34. **Not yet run on hardware** — see `GAMEPLAN.md` for the on-device
+verification checklist and the official-store (partner) track.

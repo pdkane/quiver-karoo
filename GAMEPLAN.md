@@ -31,10 +31,11 @@ The `karoo-ext` data model (`Bikes`, `SavedDevices`, `UserProfile`, `RideState`,
 `DataType.Type.DISTANCE`, `OnHttpResponse.MakeHttpRequest`) maps 1:1 onto these
 endpoints — the seed route was clearly designed against it.
 
-## What's built in this repo (v1, written, not yet compiled)
+## What's built in this repo (v1 — builds green; not yet run on hardware)
 
 - Full Kotlin/Android extension scaffolded from `karoo-ext-template`, `karoo-ext`
-  1.1.9.
+  1.1.9. `./gradlew assembleDebug` produces `app-debug.apk` on JDK 17 / Android
+  SDK 34.
 - **Pairing** UI (Compose) → claim → token in prefs.
 - **Auto ride sync**: `QuiverExtension` (a bound `KarooExtension` service) watches
   `RideState`; on Recording→Idle it POSTs ride distance via a durable outbox
@@ -44,14 +45,11 @@ endpoints — the seed route was clearly designed against it.
 
 ## Finish-line checklist (to a live sideloadable APK)
 
-1. **[PK] GitHub PAT with `read:packages`** — required to resolve the `karoo-ext`
-   dependency from GitHub Packages. Put in `~/.gradle/gradle.properties`
-   (`gpr.user` / `gpr.key`). *Hard blocker for any build.*
-2. **[Eng/PK] Android toolchain** — JDK 17 + Android SDK (cmdline-tools). Not
-   present in the authoring env. Either install headlessly or open in Android
-   Studio.
-3. **[Eng] `./gradlew assembleDebug`** — fix any compile errors (code is written
-   against the real SDK API but unverified by a compiler).
+1. ✅ **GitHub `read:packages`** — added to the `gh` login; creds in
+   `~/.gradle/gradle.properties`.
+2. ✅ **Android toolchain** — JDK 17 + Android SDK 34 + Gradle 8.6 installed.
+3. ✅ **`./gradlew assembleDebug`** — builds green (fixed a `continue`-in-inline-
+   lambda and a serialization opt-in).
 4. **[PK] On-device test on the Karoo 3** (sideload via Companion):
    - Pair with a real code from quiver.fyi; confirm the board seeds.
    - Do a short real/simulated ride; confirm mileage lands on the **Melee** odometer
@@ -70,7 +68,7 @@ endpoints — the seed route was clearly designed against it.
      watchdog. We deliberately didn't (our single-POST model makes a false end
      lossy). If `Idle` proves unreliable on-device, add a non-lossy end-detector
      (e.g. checkpoint distance to the outbox, finalize on next Recording).
-5. **[Eng] Create the GitHub repo** (`quiver-fyi/quiver-karoo` assumed — confirm),
+5. **[Eng] Create the GitHub repo** (`pdkane/quiver-karoo` assumed — confirm),
    push, cut a release with `quiver-karoo.apk` + `manifest.json` + icon.
 6. **[PK] Announce** the sideload link to Quiver riders.
 

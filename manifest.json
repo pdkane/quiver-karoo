@@ -1,8 +1,7 @@
 {
   "label": "Quiver",
   "packageName": "fyi.quiver.karoo",
-  "iconUrl": "https://github.com/quiver-fyi/quiver-karoo/releases/latest/download/quiver-icon.png",
-  "latestApkUrl": "https://github.com/quiver-fyi/quiver-karoo/releases/latest/download/quiver-karoo.apk",
+  "latestApkUrl": "https://github.com/pdkane/quiver-karoo/releases/latest/download/quiver-karoo.apk",
   "latestVersion": "0.1.0",
   "latestVersionCode": 1,
   "developer": "Quiver",
