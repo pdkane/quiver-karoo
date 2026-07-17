@@ -1,0 +1,12 @@
+{
+  "label": "Quiver",
+  "packageName": "fyi.quiver.karoo",
+  "iconUrl": "https://github.com/quiver-fyi/quiver-karoo/releases/latest/download/quiver-icon.png",
+  "latestApkUrl": "https://github.com/quiver-fyi/quiver-karoo/releases/latest/download/quiver-karoo.apk",
+  "latestVersion": "0.1.0",
+  "latestVersionCode": 1,
+  "developer": "Quiver",
+  "description": "Connect your Karoo to your Quiver garage. Pair once, and every ride's mileage syncs automatically to keep your maintenance, wear, and service clocks up to date — no manual logging.",
+  "releaseNotes": "First release: pair with your Quiver account and automatic ride-mileage sync.",
+  "tags": ["utility"]
+}
