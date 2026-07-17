@@ -68,9 +68,10 @@ endpoints — the seed route was clearly designed against it.
      watchdog. We deliberately didn't (our single-POST model makes a false end
      lossy). If `Idle` proves unreliable on-device, add a non-lossy end-detector
      (e.g. checkpoint distance to the outbox, finalize on next Recording).
-5. **[Eng] Create the GitHub repo** (`pdkane/quiver-karoo` assumed — confirm),
-   push, cut a release with `quiver-karoo.apk` + `manifest.json` + icon.
-6. **[PK] Announce** the sideload link to Quiver riders.
+5. ✅ **Public repo + v0.1.0 release** — https://github.com/pdkane/quiver-karoo
+   (release assets `quiver-karoo.apk` + `manifest.json`; `latest/download` URLs
+   verified 200). Fast-follow: add a real `quiver-icon.png` to the manifest.
+6. **[PK] Announce** the sideload link to Quiver riders (after the on-device test).
 
 ## Track B (official store) — when ready
 
