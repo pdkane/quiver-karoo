@@ -195,7 +195,8 @@ class QuiverExtension : KarooExtension("quiver", BuildConfig.VERSION_NAME) {
         for (rideJson in pending) {
             val payload = runCatching {
                 QuiverApi.json.decodeFromString(RidePayload.serializer(), rideJson)
-            }.getOrNull() ?: run {
+            }.getOrNull()
+            if (payload == null) {
                 RideOutbox.remove(applicationContext, rideJson) // unparseable, drop
                 continue
             }

@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 object QuiverApi {
     const val BASE_URL = "https://quiver.fyi"
 
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
     val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
